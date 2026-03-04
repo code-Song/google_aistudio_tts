@@ -1,0 +1,5 @@
+{
+  "name": "Voice Lab AI",
+  "description": "Advanced AI Text-to-Speech with voice analysis and custom profiles.",
+  "requestFramePermissions": ["microphone"]
+}
