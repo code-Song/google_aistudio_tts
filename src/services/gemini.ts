@@ -50,10 +50,11 @@ export interface VoiceProfile {
   description: string;
   gender: 'Masculine' | 'Feminine' | 'Neutral';
   traits: {
-    pitch: string;
-    resonance: string;
-    nasality: string;
-    texture: string;
+    pitch: number;      // 0-100
+    resonance: number;  // 0-100
+    brightness: number; // 0-100
+    roughness: number;  // 0-100
+    pace: number;       // 0-100
   };
   matchedVoice: VoiceName;
 }
@@ -63,21 +64,21 @@ export async function generateTTS(text: string, profile?: VoiceProfile): Promise
     const cleanText = text.trim();
     if (!cleanText) return null;
 
-    // Use the profile to "style" the delivery instructions with high precision
+    // High-precision neural styling instructions
     const styleInstruction = profile 
-      ? `[NEURAL VOICE CLONING ACTIVE]
-         Target Voice Signature:
-         - Gender: ${profile.gender}
-         - Pitch Level: ${profile.traits.pitch}
-         - Resonance: ${profile.traits.resonance}
-         - Nasality: ${profile.traits.nasality}
-         - Texture: ${profile.traits.texture}
-         - Character: ${profile.description}
+      ? `[NEURAL VOICE CLONING PROTOCOL]
+         Target Identity: ${profile.gender}
+         Vocal Signature:
+         - Pitch Level: ${profile.traits.pitch}/100
+         - Resonance Depth: ${profile.traits.resonance}/100
+         - Timbre Brightness: ${profile.traits.brightness}/100
+         - Texture Roughness: ${profile.traits.roughness}/100
+         - Natural Pace: ${profile.traits.pace}/100
+         - Character Note: ${profile.description}
          
-         INSTRUCTION: You must strictly mimic the user's voice signature above. 
-         If gender is Masculine, use a deep, resonant male tone. 
-         If gender is Feminine, use a clear, melodic female tone.
-         Do not deviate from the user's vocal identity.`
+         INSTRUCTION: You are the user's digital twin. Speak the following text by perfectly replicating their unique vocal DNA. 
+         If Masculine, maintain a solid chest resonance. If Feminine, maintain a clear head resonance.
+         Do not sound like a generic AI; sound like the specific human described above.`
       : "Speak naturally.";
 
     const response = await ai.models.generateContent({
@@ -91,7 +92,6 @@ export async function generateTTS(text: string, profile?: VoiceProfile): Promise
         responseModalities: [Modality.AUDIO],
         speechConfig: {
           voiceConfig: {
-            // Use the matched base voice that best fits the user's gender
             prebuiltVoiceConfig: { voiceName: profile?.matchedVoice || 'Kore' },
           },
         },
@@ -116,19 +116,20 @@ export async function trainVoiceProfile(samples: { text: string, audioBase64: st
       contents: [
         {
           parts: [
-            { text: `Analyze these 3 voice samples to create a high-fidelity neural voice profile.
+            { text: `Analyze these 3 voice samples to extract the user's unique Neural Voice DNA.
             Return a JSON object with:
             - gender: "Masculine" | "Feminine" | "Neutral"
             - traits: {
-                pitch: "Deep" | "Medium" | "High",
-                resonance: "Chest" | "Head" | "Mixed",
-                nasality: "Low" | "Medium" | "High",
-                texture: "Smooth" | "Raspy" | "Breathy"
+                pitch: number (0-100, where 0 is very deep, 100 is very high),
+                resonance: number (0-100, where 0 is thin, 100 is deep chest resonance),
+                brightness: number (0-100, where 0 is dark/muffled, 100 is bright/clear),
+                roughness: number (0-100, where 0 is smooth, 100 is raspy/textured),
+                pace: number (0-100, where 0 is slow, 100 is fast)
               }
             - matchedVoice: Choose the best base from [Charon, Fenrir, Puck, Kore, Zephyr]. 
-              * CRITICAL: If Masculine, MUST choose Charon or Fenrir.
-              * CRITICAL: If Feminine, MUST choose Kore or Zephyr.
-            - description: A technical summary of the user's unique vocal identity.` },
+              * Masculine: Charon (deep) or Fenrir (rough).
+              * Feminine: Kore (clear) or Zephyr (airy).
+            - description: A 1-sentence technical summary of their vocal character.` },
             ...samples.flatMap(s => [
               { text: `Sample: "${s.text}"` },
               { inlineData: { mimeType: "audio/wav", data: s.audioBase64 } }
@@ -145,9 +146,9 @@ export async function trainVoiceProfile(samples: { text: string, audioBase64: st
     return {
       samples: samples,
       gender: result.gender || 'Neutral',
-      traits: result.traits || { pitch: 'Medium', resonance: 'Mixed', nasality: 'Low', texture: 'Smooth' },
+      traits: result.traits || { pitch: 50, resonance: 50, brightness: 50, roughness: 10, pace: 50 },
       matchedVoice: result.matchedVoice || (result.gender === 'Masculine' ? 'Charon' : 'Kore'),
-      description: result.description || 'Neural profile active.'
+      description: result.description || 'Neural DNA profile active.'
     };
   } catch (error) {
     console.error("Voice Training Error:", error);

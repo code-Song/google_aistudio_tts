@@ -238,24 +238,44 @@ export default function App() {
 
                 {trainingStep === 5 && voiceProfile && (
                   <motion.div key="done" className="flex flex-col items-center gap-4 z-10 p-6 w-full">
-                    <div className="w-16 h-16 rounded-full bg-emerald-500/20 flex items-center justify-center">
+                    <div className="w-16 h-16 rounded-full bg-emerald-500/20 flex items-center justify-center mb-2">
                       <Activity className="w-8 h-8 text-emerald-500" />
                     </div>
-                    <div className="w-full space-y-3">
-                      <div className="flex justify-between items-center border-b border-white/5 pb-2">
-                        <span className="text-[#8E9299] font-mono text-[10px] uppercase">Status</span>
-                        <span className="text-emerald-500 font-mono text-[10px]">CLONED</span>
+                    
+                    <div className="w-full space-y-4">
+                      {/* Voice DNA Visualization */}
+                      <div className="space-y-2">
+                        <div className="flex justify-between items-center">
+                          <span className="text-[#8E9299] font-mono text-[9px] uppercase tracking-widest">Neural DNA</span>
+                          <span className="text-emerald-500 font-mono text-[9px] uppercase">Cloned</span>
+                        </div>
+                        <div className="grid grid-cols-5 gap-1 h-12 items-end">
+                          {Object.entries(voiceProfile.traits).map(([key, value], i) => (
+                            <div key={key} className="flex flex-col items-center gap-1">
+                              <motion.div 
+                                initial={{ height: 0 }}
+                                animate={{ height: `${value}%` }}
+                                className="w-full bg-emerald-500/40 rounded-t-sm border-t border-emerald-500/60"
+                              />
+                              <span className="text-[7px] text-[#8E9299] font-mono uppercase truncate w-full text-center">{key}</span>
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                      <div className="flex justify-between items-center border-b border-white/5 pb-2">
-                        <span className="text-[#8E9299] font-mono text-[10px] uppercase">Gender</span>
-                        <span className="text-white font-mono text-[10px]">{voiceProfile.gender}</span>
-                      </div>
-                      <div className="flex justify-between items-center border-b border-white/5 pb-2">
-                        <span className="text-[#8E9299] font-mono text-[10px] uppercase">Samples</span>
-                        <span className="text-white font-mono text-[10px]">{voiceProfile.samples.length} / 3</span>
+
+                      <div className="space-y-2 pt-2 border-t border-white/5">
+                        <div className="flex justify-between items-center">
+                          <span className="text-[#8E9299] font-mono text-[10px] uppercase">Gender</span>
+                          <span className="text-white font-mono text-[10px]">{voiceProfile.gender}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-[#8E9299] font-mono text-[10px] uppercase">Base Engine</span>
+                          <span className="text-white font-mono text-[10px]">{voiceProfile.matchedVoice}</span>
+                        </div>
                       </div>
                     </div>
-                    <button onClick={() => { setTrainingStep(0); setSamples([]); }} className="text-[#8E9299] hover:text-white font-mono text-[9px] uppercase tracking-widest mt-2">Retrain Profile</button>
+                    
+                    <button onClick={() => { setTrainingStep(0); setSamples([]); }} className="text-[#8E9299] hover:text-white font-mono text-[9px] uppercase tracking-widest mt-4">Retrain Neural DNA</button>
                   </motion.div>
                 )}
               </AnimatePresence>
